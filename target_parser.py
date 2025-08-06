@@ -1,31 +1,21 @@
 from bs4 import BeautifulSoup
-from utilities import CATEGORIES, get_content
+from utilities import get_content
+from CategoryOrganizer import CategoryOrganizer
 
-FILE = "/Users/andrewmiller/Desktop/target.html"
-
-def organize(name, price):
-    for category, keywords in CATEGORIES.items():
-        if any(keyword in name.lower() for keyword in keywords):
-            organized_items[category].append({"name": name, "price": price})
-            return True
-    return False
+FILE = "/Users/andrewmiller/Desktop/order.html"
 
 if __name__ == '__main__':
+    organizer = CategoryOrganizer()
     soup = get_content(FILE)
-    items = soup.findAll('div', {"data-test": "invoice-details-card"})
-    organized_items = {category: [] for category in CATEGORIES}
+    # items = soup.findAll('div', {"data-test": "invoice-details-card"})
+    items = soup.findAll("div", {"class": "kqpKGC"})
     for item in items:
-        name_html = item.find('p', {"class": "h-padding-b-tight"})
-        price_html = item.findAll('div', {"class": "sc-be7acf58-2"})[-1]
+        name_html = item.find("h3", {"class": "styles_ndsHeading__HcGpD"})
+        price_html = item.find('span', {"data-test": "order-price"})
+        qty_html = item.find('p',{"class":"h-text-sm"})
         name = name_html.text.strip()
-        price = float(price_html.text.strip().replace('Item total','').replace('$',''))
-        result = organize(name, price)
-        if not result:
-            organized_items["Other"].append({"name": name, "price": price})
-    for category, items in organized_items.items():
-        total = sum(item["price"] for item in items)
-        if total > 0:
-            print(f"\n{category}: ${total}")
-            # total = 
-            for item in items:
-                print(item)
+        price = float(price_html.text.strip().replace('$','').replace(' each','').replace(' unit price',''))
+        qty = int(qty_html.text.strip().split(' ')[1])
+        price = price * qty
+        organizer.organize_item(name, price)
+    organizer.print_summary()

@@ -2,10 +2,10 @@ from bs4 import BeautifulSoup
 from utilities import get_content
 from CategoryOrganizer import CategoryOrganizer
 
-FILE = "/Users/andrewmiller/Desktop/costco.html"
+FILE = "/Users/andrewmiller/Desktop/order.html"
 
 def prep_price(price_html):
-    remove = ['$', 'Y', 'N','-']
+    remove = ['$', 'Y', 'N','-', "D"]
     price = price_html.text
     for r in remove:
         price = price.replace(r,'')

@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from utilities import get_content
 from CategoryOrganizer import CategoryOrganizer
 
-FILE = "/Users/andrewmiller/Desktop/bjs.html"
+FILE = input("File path: ") or "/Users/andrewmiller/Desktop/order.html"
 
 if __name__ == '__main__':
     organizer = CategoryOrganizer()

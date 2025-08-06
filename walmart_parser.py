@@ -3,33 +3,22 @@ from CategoryOrganizer import CategoryOrganizer
 import pprint
 import sys
 
-FILE = "/Users/andrewmiller/Desktop/walmart.html"
+FILE = input("Path to reciept file: ") or "/Users/andrewmiller/Desktop/order.html"
 
 
 sys.dont_write_bytecode = True
-
-# def organize(name, price):
-#     for category, keywords in CATEGORIES.items():
-#         if any(keyword in name.lower() for keyword in keywords):
-#             organized_items[category].append({"name": name, "price": price})
-#             return True
-#     return False
-
-# def inspect_element(element):
-#     print(f"Element Type: {type(element).__name__}")
-#     print(f"Name: {element.name}") 
-#     print(f"Attributes: {element.attrs}")
-#     print(f"Text Content: {element.text}")
-#     print(f"String Content: {element.string}")
-#     print(f"Parent: {element.parent}")
-#     print(f"Children:")
-#     pprint.pprint(list(element.children)) 
 
 if __name__ == '__main__':
     organizer = CategoryOrganizer()
     soup = get_content(FILE)
     items = soup.findAll('div', {"data-testid": "itemtile-stack"})
+    if not items:
+        print("No items found in the receipt.")
     for item in items:
+        # Check if the item is in the unavailable section
+        if item.find_parent('div', {"data-testid": "category-accordion-"}):
+            continue
+        
         name_html = item.find('span', {"class": "w_V_DM"})
         price_html = item.find('div', {"data-testid": "line-price"})
         for span in price_html.find_all('span', class_='w_iUH7'):
