@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const ReviewPage: React.FC = () => {
   const [data, setData] = useState<any>(() => {
@@ -9,6 +9,19 @@ const ReviewPage: React.FC = () => {
   const [editItem, setEditItem] = useState<any>(null);
   const [newCategory, setNewCategory] = useState("");
   const [newTerm, setNewTerm] = useState("");
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+
+  // Fetch all categories from backend for the dropdown
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const res = await fetch("/api/categories");
+      const result = await res.json();
+      if (result.categories) {
+        setAllCategories(result.categories.map((cat: any) => cat.name));
+      }
+    };
+    fetchCategories();
+  }, []);
 
   if (!data) {
     return (
@@ -34,7 +47,6 @@ const ReviewPage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // TODO: Replace with your backend endpoint
     await fetch("/api/update-term", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -45,9 +57,36 @@ const ReviewPage: React.FC = () => {
         newTerm,
       }),
     });
-    // Update UI (for now, just close modal and reload page)
+    // Re-categorize the receipt data locally
+    setData((prev: any) => {
+      if (!prev) return prev;
+      // Remove the item from the old category
+      const oldCatItems = prev.categories[editItem.oldCategory].items.filter((i: any) => i.name !== editItem.name);
+      // Add the item to the new category (or create it if not present)
+      const newCatItems = prev.categories[newCategory]?.items ? [...prev.categories[newCategory].items] : [];
+      // If the term already exists in the new category, update it; else add it
+      const existingIdx = newCatItems.findIndex((i: any) => i.name === newTerm);
+      const updatedItem = { ...editItem, name: newTerm };
+      if (existingIdx !== -1) {
+        newCatItems[existingIdx] = updatedItem;
+      } else {
+        newCatItems.push(updatedItem);
+      }
+      // Rebuild categories
+      const newCategories = { ...prev.categories };
+      newCategories[editItem.oldCategory] = {
+        ...newCategories[editItem.oldCategory],
+        items: oldCatItems,
+        total_price: oldCatItems.reduce((sum: number, i: any) => sum + i.price, 0)
+      };
+      newCategories[newCategory] = {
+        ...newCategories[newCategory],
+        items: newCatItems,
+        total_price: newCatItems.reduce((sum: number, i: any) => sum + i.price, 0)
+      };
+      return { ...prev, categories: newCategories };
+    });
     handleModalClose();
-    window.location.reload();
   };
 
   return (
@@ -161,7 +200,7 @@ const ReviewPage: React.FC = () => {
               value={newCategory}
               onChange={e => setNewCategory(e.target.value)}
             >
-              {Object.keys(data.categories).map(cat => (
+              {allCategories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
