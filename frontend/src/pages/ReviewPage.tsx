@@ -5,6 +5,10 @@ const ReviewPage: React.FC = () => {
     const saved = localStorage.getItem("receiptData");
     return saved ? JSON.parse(saved) : null;
   });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+  const [newCategory, setNewCategory] = useState("");
+  const [newTerm, setNewTerm] = useState("");
 
   if (!data) {
     return (
@@ -14,6 +18,37 @@ const ReviewPage: React.FC = () => {
       </div>
     );
   }
+
+  const handleEditClick = (category: string, item: any) => {
+    setEditItem({ ...item, oldCategory: category });
+    setNewCategory(category);
+    setNewTerm(item.name);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setEditItem(null);
+    setNewCategory("");
+    setNewTerm("");
+  };
+
+  const handleSave = async () => {
+    // TODO: Replace with your backend endpoint
+    await fetch("/api/update-term", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        oldCategory: editItem.oldCategory,
+        oldTerm: editItem.name,
+        newCategory,
+        newTerm,
+      }),
+    });
+    // Update UI (for now, just close modal and reload page)
+    handleModalClose();
+    window.location.reload();
+  };
 
   return (
     <div className="max-w-xl mx-auto mt-10 p-6 border border-gray-200 rounded-lg bg-white shadow">
@@ -73,39 +108,14 @@ const ReviewPage: React.FC = () => {
       <div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">Categories</h3>
         {Object.entries(data.categories).map(([category, categoryData]: [string, any]) => (
-          // <div key={category} className="mb-5 p-4 bg-gray-50 rounded">
-          //   <h4 className="text-lg font-semibold text-gray-700 mb-2">{category}: <span class="text-sm">${categoryData.total_price.toFixed(2)}</span></h4>
-          //   <ul className="list-disc list-inside space-y-1">
-          //     {categoryData.items.length === 0 ? (
-          //       <li className="text-gray-400 italic">No items</li>
-          //     ) : (
-          //       categoryData.items.map((item: any, idx: number) => (
-          //         <li key={idx} className="text-gray-700">
-          //           <span className="font-medium">{item.name}</span> — <span className="text-gray-600">${item.price.toFixed(2)}</span>
-          //         </li>
-          //       ))
-          //     )}
-          //   </ul>
-          //   <div className="mt-2 text-sm text-gray-600 font-semibold">Total: ${categoryData.total_price.toFixed(2)}</div>
-          // </div>
           <div key={category} className="mb-5 p-4 bg-gray-50 rounded" id={category}>
-            <h4 className="text-left text-xl font-semibold text-gray-700">{category}</h4>
             <table className="w-full table-auto">
               <thead>
                 <tr>
-                  {/* <th></th> */}
-                  <th className="text-left text-xl font-semibold text-gray-700"></th>
-                    <th className="text-right font-semibold text-gray-700">
+                  <th className="text-left text-xl font-semibold text-gray-700 py-3">{category}</th>
+                  <th className="text-right font-semibold text-gray-700 p-3"  onClick={() => navigator.clipboard.writeText(categoryData.total_price.toFixed(2))}>
                     ${categoryData.total_price.toFixed(2)}
-                    <button
-                      className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 focus:outline-none"
-                      onClick={() => navigator.clipboard.writeText(categoryData.total_price.toFixed(2))}
-                      title="Copy total to clipboard"
-                      type="button"
-                    >
-                      Copy
-                    </button>
-                    </th>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -115,12 +125,24 @@ const ReviewPage: React.FC = () => {
                   </tr>
                 ) : (
                   categoryData.items.map((item: any, idx: number) => (
-                    <tr key={idx}>
-                        {/* <td>
-                        <span role="img" aria-label="edit" className="cursor-pointer">✏️</span>
-                        </td> */}
-                      <td className="text-gray-700">{item.name}</td>
-                      <td className="text-right text-gray-600">${item.price.toFixed(2)}</td>
+                    <tr
+                      key={idx}
+                      className={`group ${idx % 2 === 0 ? 'bg-gray-100' : 'bg-gray-200'}`}
+                    >
+                      <td className="text-gray-700 flex items-center py-3 px-2">
+                        {item.name}
+                        <button
+                          className="ml-2 p-1 text-xs rounded hover:bg-blue-100 focus:outline-none invisible group-hover:visible"
+                          onClick={() => handleEditClick(category, item)}
+                          type="button"
+                          aria-label="Edit Category"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.536-6.536a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H7v-3a2 2 0 01.586-1.414z" />
+                          </svg>
+                        </button>
+                      </td>
+                      <td className="text-right text-gray-600 py-3 px-2">${item.price.toFixed(2)}</td>
                     </tr>
                   ))
                 )}
@@ -128,6 +150,46 @@ const ReviewPage: React.FC = () => {
             </table>
           </div>
         ))}
+      {/* Modal for editing category/term */}
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Edit Item Category</h3>
+            <label className="block mb-2 font-medium">Category</label>
+            <select
+              className="w-full mb-4 p-2 border rounded"
+              value={newCategory}
+              onChange={e => setNewCategory(e.target.value)}
+            >
+              {Object.keys(data.categories).map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            <label className="block mb-2 font-medium">Term (text for database)</label>
+            <input
+              className="w-full mb-4 p-2 border rounded"
+              value={newTerm}
+              onChange={e => setNewTerm(e.target.value)}
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                onClick={handleModalClose}
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={handleSave}
+                type="button"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
