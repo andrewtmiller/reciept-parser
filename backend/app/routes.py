@@ -13,7 +13,6 @@ def parse_receipt():
 
     try:
         parsed_items = categorize_receipt(html_content)
-        print(parsed_items)
         return jsonify(parsed_items)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

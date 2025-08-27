@@ -21,7 +21,9 @@ class CategoryOrganizer:
                 "razor",
                 "ponytail",
                 "sunscreen",
-                "brightening serum"
+                "brightening serum",
+                "bar soap",
+                "brush"
             ],
             "Clothing": [
                 "sweater",
@@ -79,7 +81,8 @@ class CategoryOrganizer:
                 "ks dish pacs",
                 "laundry",
                 "light bulb",
-                "lysol" "mop",
+                "lysol", 
+                "mop",
                 "outlet",
                 "paper towel",
                 "parchment paper",
@@ -101,7 +104,13 @@ class CategoryOrganizer:
                 "clorox",
                 "duracell",
                 "ks bath",
-                "food storage"
+                "food storage",
+                "disposable cups",
+                "paper plates",
+                "table cover",
+                "toilet paper",
+                "paper towels",
+                "dish soap"
             ],
             "Medical": [
                 "cough drops",
@@ -112,6 +121,9 @@ class CategoryOrganizer:
                 "supplement",
                 "softgels",
                 "pregnancy test",
+                "sleep-aid",
+                "mylanta",
+                "tums"
             ],
             "Baby Supplies": ["diapers", "baby wipes", "diaper", "baby wipe"],
             "Gifts": [
@@ -121,11 +133,16 @@ class CategoryOrganizer:
                 "christmas tree",
                 "nutcraker",
             ],
-            "Furnishings": ["curtain"],
+            "Furnishings": ["curtain","thread count","bedding","comforter","pillow"],
             "Groceries": [
                 "4lb cosmic",
+                "larabar",
+                "ice cream",
+                "great value",
                 "almndcracker",
                 "apothic red",
+                "creamer",
+                "ranch dip",
                 "apple",
                 "apples",
                 "applesauce",
@@ -368,6 +385,20 @@ class CategoryOrganizer:
                 "cake mix",
                 "sprite",
                 "crescent rolls",
+                "salt & vinegar",
+                "red wine vinegar",
+                "vinegar",
+                "mayonnaise",
+                "walnuts",
+                "veggie dip",
+                "naan",
+                "waffle",
+                "pancake",
+                "cole slaw"
+            ],
+            "Education": [
+                "highlighter",
+                "flash cards: multiplication 0 - 12 (other)"
             ],
             "Other": [],
         }

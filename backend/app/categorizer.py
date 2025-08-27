@@ -6,21 +6,25 @@ def categorize_receipt(html: str):
     if any(domain in html.lower() for domain in ["walmart.com", "walmartimages.com"]):
         from app.parsers.walmart import WalmartReceiptParser
         walmart = WalmartReceiptParser(html)
+        store = "Walmart"
         items = walmart.parse_items()
     elif "amazon.com" in html.lower():
         items = "Amazon"
+        store = "Amazon"
         # items = amazon.parse(html)
     elif "costco.com" in html.lower():
         items = "Costco"
+        store = "Costco"
         # items = costco.parse(html)
     elif "bjs.com" in html.lower():
         items = "BJs"
+        store = "BJs"
         # items = bjs.parse(html)
     elif any(domain in html.lower() for domain in ["target.com", "targetimg1.com"]):
         from app.parsers.target import TargetReceiptParser
-        print("Target!")
+        store = "Target"
         parser = TargetReceiptParser(html)
-        items = parser.to_json()
+        items = parser.parse_items()
     else:
         raise ValueError("Store could not be identified.")
 
@@ -36,5 +40,9 @@ def categorize_receipt(html: str):
             organizer.organize_item(item['name'], item['price'])
         else:
             raise ValueError("Invalid item format. Each item should be a dictionary with 'name' and 'price' keys.")
-
-    return organizer.get_summary()
+        
+    # Return the summary of categorized items
+    return {
+        "store": store,
+        "categories": organizer.get_summary(),
+    }
