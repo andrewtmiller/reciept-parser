@@ -93,7 +93,18 @@ const ReviewPage: React.FC = () => {
     <div className="max-w-xl mx-auto mt-10 p-6 border border-gray-200 rounded-lg bg-white shadow">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Review Parsed Receipt</h2>
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-700 mb-1">Store: <span className="font-normal">{data.store}</span></h3>
+        <div className="flex items-center mb-1">
+          {data.logo && (
+            <img
+              src={data.logo}
+              alt={`${data.store} logo`}
+              className="w-10 h-10 rounded-full object-cover mr-3 border border-gray-200"
+            />
+          )}
+          <h3 className="text-lg font-semibold text-gray-700">
+            Store: <span className="font-normal">{data.store}</span>
+          </h3>
+        </div>
         <p className="text-gray-600">Total Items: <span className="font-semibold">{Object.values(data.categories).reduce((acc: number, cat: any) => acc + cat.items.length, 0)}</span></p>
         <p className="text-gray-600">Total Price: <span className="font-semibold">${Object.values(data.categories).reduce((acc: number, cat: any) => acc + cat.total_price, 0).toFixed(2)}</span></p>
       </div>

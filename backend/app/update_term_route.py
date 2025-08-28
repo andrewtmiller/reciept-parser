@@ -5,6 +5,26 @@ from .models import Category, Term
 
 update_bp = Blueprint("update", __name__)
 
+
+@update_bp.route("/api/admin/lowercase-terms", methods=["POST"])
+def lowercase_all_terms():
+    session = Session()
+    try:
+        terms = session.query(Term).all()
+        changed = 0
+        for term in terms:
+            if term.name != term.name.lower():
+                term.name = term.name.lower()
+                changed += 1
+        session.commit()
+        return jsonify({"success": True, "changed": changed})
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        session.close()
+
+
 # Adjust path if needed
 DB_URL = "sqlite:///categories.db"
 engine = create_engine(DB_URL)
@@ -96,6 +116,8 @@ def add_term():
     data = request.get_json()
     category_name = data.get("category")
     term = data.get("term")
+    if term:
+        term = term.lower()
     if not (category_name and term):
         return jsonify({"error": "Missing data"}), 400
     session = Session()

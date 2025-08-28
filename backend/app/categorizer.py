@@ -1,10 +1,12 @@
 from app.organizer import CategoryOrganizer
 
+
 def categorize_receipt(html: str):
     items = []
     # Very basic detection logic — improve as needed
     if any(domain in html.lower() for domain in ["walmart.com", "walmartimages.com"]):
         from app.parsers.walmart import WalmartReceiptParser
+
         walmart = WalmartReceiptParser(html)
         store = "Walmart"
         items = walmart.parse_items()
@@ -22,7 +24,9 @@ def categorize_receipt(html: str):
         # items = bjs.parse(html)
     elif any(domain in html.lower() for domain in ["target.com", "targetimg1.com"]):
         from app.parsers.target import TargetReceiptParser
+
         store = "Target"
+        logo = "https://upload.wikimedia.org/wikipedia/commons/9/9a/Target_logo.svg"
         parser = TargetReceiptParser(html)
         items = parser.parse_items()
     else:
@@ -36,13 +40,16 @@ def categorize_receipt(html: str):
         return items
     organizer = CategoryOrganizer()
     for item in items:
-        if isinstance(item, dict) and 'name' in item and 'price' in item:
-            organizer.organize_item(item['name'], item['price'])
+        if isinstance(item, dict) and "name" in item and "price" in item:
+            organizer.organize_item(item["name"], item["price"])
         else:
-            raise ValueError("Invalid item format. Each item should be a dictionary with 'name' and 'price' keys.")
-        
+            raise ValueError(
+                "Invalid item format. Each item should be a dictionary with 'name' and 'price' keys."
+            )
+
     # Return the summary of categorized items
     return {
         "store": store,
+        "logo": logo if "logo" in locals() else None,
         "categories": organizer.get_summary(),
     }
