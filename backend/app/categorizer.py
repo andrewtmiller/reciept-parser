@@ -16,9 +16,12 @@ def categorize_receipt(html: str):
         store = "Amazon"
         # items = amazon.parse(html)
     elif "costco.com" in html.lower():
-        items = "Costco"
+        from app.parsers.costco import CostcoReceiptParser
+
+        costco = CostcoReceiptParser(html)
+        logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Costco_Wholesale_logo_2010-10-26.svg/1280px-Costco_Wholesale_logo_2010-10-26.svg.png"
         store = "Costco"
-        # items = costco.parse(html)
+        items = costco.parse_items()
     elif "bjs-universal-app" in html.lower():
         from app.parsers.bjs import BJsReceiptParser
 
