@@ -4,10 +4,12 @@ import UploadPage from "./pages/UploadPage";
 import ReviewPage from "./pages/ReviewPage";
 import CategoryManagerPage from "./pages/CategoryManagerPage";
 import AdminPage from "./pages/AdminPage";
+import NavBar from "./components/NavBar";
 
 function App() {
   return (
     <Router>
+      <NavBar />
       <Routes>
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/review" element={<ReviewPage />} />

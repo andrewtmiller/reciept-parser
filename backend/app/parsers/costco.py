@@ -6,27 +6,6 @@ class CostcoReceiptParser(RecieptParser):
         super().__init__(html_text)
 
     def parse_items(self):
-        # items = self.soup.findAll("tr", {"class": "MuiTableRow-root"})
-        # if not items:
-        #     raise ValueError("No items found in the Costco receipt.")
-        # parsed_items = []
-        # for i in range(len(items)):
-        #     item = items[i]
-        #     next_item = items[i + 1] if i + 1 < len(items) else None
-        #     if item.contents[1].text == "SUBTOTAL":
-        #         break
-        #     if "-" in item.contents[3].text:
-        #         continue
-        #     name_html = item.contents[2]
-        #     price_html = item.contents[3]
-        #     name = name_html.text.strip()
-        #     price = self.prep_price(price_html)
-        #     if next_item and len(next_item.contents) > 3:
-        #         if "-" in next_item.contents[3].text:
-        #             discount = self.prep_price(next_item.contents[3])
-        #             price = price - discount
-        #     parsed_items.append({"name": name, "price": price})
-        # return parsed_items
         items = []
         table = self.soup.find("table", {"class": "MuiTable-root"})
         if not table:
