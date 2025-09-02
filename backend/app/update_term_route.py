@@ -127,7 +127,7 @@ def add_term():
             return jsonify({"error": "Category not found"}), 404
         if session.query(Term).filter_by(name=term, category_id=category.id).first():
             return jsonify({"error": "Term already exists in this category"}), 400
-        session.add(Term(name=term, category_id=category.id))
+        session.add(Term(name=term.lower(), category_id=category.id))
         session.commit()
         return jsonify({"success": True})
     except Exception as e:

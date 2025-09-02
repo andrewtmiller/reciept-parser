@@ -10,6 +10,7 @@ def categorize_receipt(html: str):
         walmart = WalmartReceiptParser(html)
         store = "Walmart"
         items = walmart.parse_items()
+        logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Walmart_spark_%282025%29.svg/1280px-Walmart_spark_%282025%29.svg.png"
     elif "amazon.com" in html.lower():
         items = "Amazon"
         store = "Amazon"
@@ -18,16 +19,28 @@ def categorize_receipt(html: str):
         items = "Costco"
         store = "Costco"
         # items = costco.parse(html)
-    elif "bjs.com" in html.lower():
+    elif "bjs-universal-app" in html.lower():
+        from app.parsers.bjs import BJsReceiptParser
+
+        bjs = BJsReceiptParser(html)
+        logo = "https://www.bjs.com/assets/images/icons/BJsNewLogo.svg"
         items = "BJs"
         store = "BJs"
-        # items = bjs.parse(html)
+        items = bjs.parse_items()
     elif any(domain in html.lower() for domain in ["target.com", "targetimg1.com"]):
         from app.parsers.target import TargetReceiptParser
 
         store = "Target"
         logo = "https://upload.wikimedia.org/wikipedia/commons/9/9a/Target_logo.svg"
         parser = TargetReceiptParser(html)
+        items = parser.parse_items()
+
+    elif any(domain in html.lower() for domain in ["lowes.com"]):
+        store = "Lowe's"
+        logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Lowe%27s_logo.svg/1280px-Lowe%27s_logo.svg.png"
+        from app.parsers.lowes import LowesReceiptParser
+
+        parser = LowesReceiptParser(html)
         items = parser.parse_items()
     else:
         raise ValueError("Store could not be identified.")

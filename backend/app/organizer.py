@@ -21,7 +21,9 @@ class CategoryOrganizer:
 
     def organize_item(self, item_name, item_price):
         item_name_lower = item_name.lower()
-        for category, keywords in self.categories.items():
+        # Sort categories by number of terms (ascending)
+        sorted_categories = sorted(self.categories.items(), key=lambda x: len(x[1]))
+        for category, keywords in sorted_categories:
             if any(keyword in item_name_lower for keyword in keywords):
                 self.organized_items[category].append(
                     {"name": item_name, "price": item_price}
